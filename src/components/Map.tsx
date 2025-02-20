@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Vigilance } from '../types/vigilance';
@@ -48,11 +48,23 @@ export function Map({ vigilances }: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
+  const [mapKey, setMapKey] = useState(0); // Ajout d'une clé pour forcer le remontage
+
+  // Effet pour réinitialiser la carte quand les vigilances changent
+  useEffect(() => {
+    setMapKey(prev => prev + 1); // Force le remontage du composant
+  }, [vigilances]);
 
   useEffect(() => {
-    if (mapRef.current || !mapContainer.current) return;
+    if (!mapContainer.current) return;
 
-    // Créer la carte centrée sur la France
+    // Nettoyer la carte précédente si elle existe
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+
+    // Créer une nouvelle carte
     mapRef.current = L.map(mapContainer.current, {
       center: FRANCE_CENTER,
       zoom: 6,
@@ -72,14 +84,16 @@ export function Map({ vigilances }: MapProps) {
 
     // S'assurer que la vue est centrée sur la France
     mapRef.current.fitBounds(FRANCE_BOUNDS, {
-      padding: [20, 20], // Ajouter une marge
-      animate: false     // Pas d'animation au chargement initial
+      padding: [20, 20],
+      animate: false
     });
 
     // Charger et ajouter les départements
     fetch(DEPARTMENTS_GEOJSON_URL)
       .then(response => response.json())
       .then(data => {
+        if (!mapRef.current) return;
+
         geoJsonLayerRef.current = L.geoJSON(data, {
           style: {
             fillColor: 'transparent',
@@ -87,37 +101,25 @@ export function Map({ vigilances }: MapProps) {
             weight: 1,
             color: '#666',
           }
-        }).addTo(mapRef.current!);
+        }).addTo(mapRef.current);
 
-        // Mettre à jour les styles si des vigilances sont déjà chargées
-        if (vigilances.length > 0) {
-          updateDepartmentsStyle();
-        }
+        // Mettre à jour les styles immédiatement
+        updateDepartmentsStyle();
 
-        // Recentrer la carte après le chargement des départements
-        mapRef.current?.fitBounds(FRANCE_BOUNDS, {
+        // Recentrer la carte
+        mapRef.current.fitBounds(FRANCE_BOUNDS, {
           padding: [20, 20],
           animate: false
         });
       });
 
-    // Ajouter un gestionnaire d'événements pour maintenir la vue sur la France
-    mapRef.current.on('moveend', () => {
-      const currentBounds = mapRef.current?.getBounds();
-      
-      if (currentBounds && !FRANCE_BOUNDS.contains(currentBounds)) {
-        mapRef.current?.fitBounds(FRANCE_BOUNDS, {
-          padding: [20, 20],
-          animate: true
-        });
-      }
-    });
-
     return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, []);
+  }, [mapKey]); // Dépendance à mapKey au lieu de []
 
   // Fonction pour mettre à jour les styles des départements
   const updateDepartmentsStyle = () => {
@@ -176,6 +178,7 @@ export function Map({ vigilances }: MapProps) {
 
   return (
     <div 
+      key={mapKey} // Ajout de la clé pour forcer le remontage
       ref={mapContainer}
       style={{ 
         height: '100%',
