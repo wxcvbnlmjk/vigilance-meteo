@@ -131,21 +131,28 @@ function App() {
       
       // setVigilances(filteredData);
       setAllVigilances(filteredData);
-      // setFilteredVigilances(filteredData);
+      setFilteredVigilances(filteredData);
 
-      // // Extraire les valeurs uniques pour les filtres
+      // Extraire les valeurs uniques pour les filtres
       // const dates = [...new Set(filteredData.map(v => 
       //   new Date(v.begin_time).toLocaleDateString('fr-FR')
       // ))].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-      // Créer la liste des départements avec leurs noms et trier par nom
-      const departments = [...new Set(filteredData
+      // Créer la liste des départements uniques avec leurs noms
+      const departmentSet = new Set();
+      const departments = filteredData
         .filter(v => v.domain_id !== 'FRA')
-        .map(v => ({
-          code: v.domain_id,
-          name: DEPARTMENTS[v.domain_id] || v.domain_id
-        }))
-      )].sort((a, b) => a.name.localeCompare(b.name, 'fr-FR'));
+        .reduce((acc, v) => {
+          if (!departmentSet.has(v.domain_id)) {
+            departmentSet.add(v.domain_id);
+            acc.push({
+              code: v.domain_id,
+              name: DEPARTMENTS[v.domain_id] || v.domain_id
+            });
+          }
+          return acc;
+        }, [] as { code: string; name: string }[])
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr-FR'));
 
       const phenomena = [...new Set(filteredData.map(v => 
         JSON.stringify({ id: v.phenomenon_id, name: v.phenomenon })

@@ -130,40 +130,51 @@ export function Map({ vigilances }: MapProps) {
       const geoJsonFeature = (layer as any).feature as Department;
       
       if (geoJsonFeature && geoJsonFeature.properties) {
-        const vigilance = vigilances.find(v => 
+        const departmentVigilances = vigilances.filter(v => 
           v.domain_id === geoJsonFeature.properties.code
         );
         
-        if (vigilance && vigilance.color_id in VIGILANCE_CONFIG) {
-          const config = VIGILANCE_CONFIG[vigilance.color_id];
+        if (departmentVigilances.length > 0) {
+          const maxVigilance = departmentVigilances.reduce((max, v) => 
+            v.color_id > max.color_id ? v : max
+          , departmentVigilances[0]);
+
+          const config = VIGILANCE_CONFIG[maxVigilance.color_id];
           path.setStyle({
             fillColor: config.color,
             fillOpacity: 0.6
           });
 
-          const popupContent = `
-            <div class="p-4">
-              <h3 class="text-lg font-bold mb-2">${geoJsonFeature.properties.nom}</h3>
-              <div class="space-y-2">
-                <p class="font-semibold" style="color: ${config.color}">
-                  ${config.label}
-                </p>
-                <p class="font-medium">
-                  Phénomène : ${vigilance.phenomenon}
-                </p>
-                <div class="text-sm">
-                  <p>Début : ${formatDate(vigilance.begin_time)}</p>
-                  <p>Fin : ${formatDate(vigilance.end_time)}</p>
+          // Version plus compacte de la liste des vigilances
+          const vigilancesList = departmentVigilances
+            .sort((a, b) => b.color_id - a.color_id)
+            .map(vigilance => {
+              const vConfig = VIGILANCE_CONFIG[vigilance.color_id];
+              return `
+                <div class="mb-2 text-sm">
+                  <div class="flex items-center gap-2">
+                    <span style="color: ${vConfig.color}" class="font-bold">●</span>
+                    <span class="font-medium">${vigilance.phenomenon}</span>
+                  </div>
+                  <div class="ml-4 text-xs text-gray-600">
+                    ${formatDate(vigilance.begin_time).split('à')[0]} → ${formatDate(vigilance.end_time).split('à')[0]}
+                  </div>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">
-                  Mis à jour le ${formatDate(vigilance.product_datetime)}
-                </p>
+              `;
+            })
+            .join('');
+
+          const popupContent = `
+            <div class="p-2">
+              <h3 class="text-base font-bold mb-2">${geoJsonFeature.properties.nom}</h3>
+              <div>
+                ${vigilancesList}
               </div>
             </div>
           `;
 
           path.bindPopup(popupContent, {
-            maxWidth: 300,
+            maxWidth: 250,
             className: 'vigilance-popup'
           });
         }
