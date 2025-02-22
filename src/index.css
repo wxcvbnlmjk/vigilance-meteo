@@ -28,3 +28,26 @@ body {
 .vigilance-popup .leaflet-popup-tip-container {
   margin-top: -1px;
 }
+
+/* Styles spécifiques au mode sombre pour la carte */
+[data-theme='dark'] .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+[data-theme='dark'] .leaflet-container {
+  background: #303030;
+}
+
+/* Styles pour les popups en mode sombre */
+[data-theme='dark'] .vigilance-popup .leaflet-popup-content-wrapper {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+[data-theme='dark'] .vigilance-popup .leaflet-popup-tip {
+  background-color: #2a2a2a;
+}
+
+[data-theme='dark'] .text-gray-600 {
+  color: #9ca3af;
+}

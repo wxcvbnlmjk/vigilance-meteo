@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { Map } from './components/Map'
+import { ThemeToggle } from './components/ThemeToggle'
 import { Vigilance, VigilanceFilters } from './types/vigilance'
 import { getVigilances } from './services/vigilanceApi'
 
@@ -211,6 +212,9 @@ function App() {
       <header className="navbar bg-base-200 shadow-lg">
         <div className="flex-1">
           <h1 className="text-xl font-bold px-4">Vigilances Météo</h1>
+        </div>
+        <div className="flex-none">
+          <ThemeToggle />
         </div>
       </header>
 
