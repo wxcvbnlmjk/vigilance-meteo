@@ -263,9 +263,9 @@ function App() {
           <div className="md:col-span-3 bg-base-200 rounded-lg relative" style={{ height: '600px' }}>
             <Map vigilances={filteredVigilances} />
           </div>
-        </div>
+      </div>
       </main>
-    </div>
+      </div>
   )
 }
 

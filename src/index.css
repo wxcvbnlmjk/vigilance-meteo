@@ -51,3 +51,14 @@ body {
 [data-theme='dark'] .text-gray-600 {
   color: #9ca3af;
 }
+
+/* Styles pour les conteneurs d'icônes de vigilance */
+.vigilance-icon-container {
+  background-color: transparent;
+  border: none;
+}
+
+/* Applique un mode de fusion pour rendre le fond blanc des pictogrammes transparent */
+.vigilance-pictogram-icon {
+  mix-blend-mode: multiply;
+}

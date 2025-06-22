@@ -17,6 +17,19 @@ const formatDate = (dateStr: string) => {
   });
 };
 
+// Mappage entre l'ID du phénomène et le nom du fichier image correspondant
+const PHENOMENON_ICON_MAP: Record<number, string> = {
+  1: 'vent violent.png',
+  2: 'pluie-inondation.png',
+  3: 'orage.png', // Corrigé depuis 'orages.png' pour correspondre au nom de fichier
+  4: 'inondation.png',
+  5: 'neige-verglas.png',
+  6: 'canicule.png',
+  7: 'canicule.png', // Fallback pour 'grand-froid.png' qui est manquant
+  8: 'avalanches.png',
+  9: 'vagues-submersion.png',
+};
+
 // Couleurs des vigilances avec leurs labels
 const VIGILANCE_CONFIG: Record<number, { color: string; label: string }> = {
   2: { color: '#ffeb3b', label: 'Jaune - Soyez attentif' },
@@ -29,8 +42,8 @@ const DEPARTMENTS_GEOJSON_URL = 'https://raw.githubusercontent.com/gregoiredavid
 
 // Coordonnées de la France métropolitaine
 const FRANCE_BOUNDS_COORDS = [
-  [42.333, -5.142], // Sud-Ouest
-  [50.7509, 9.561]   // Nord-Est
+  [41.333, -5.142], // Sud-Ouest
+  [50.7509, 9.561]  // Nord-Est  8.861
 ] as [[number, number], [number, number]];
 
 const FRANCE_BOUNDS = L.latLngBounds(
@@ -105,6 +118,45 @@ export function Map({ vigilances }: MapProps) {
 
         // Mettre à jour les styles immédiatement
         updateDepartmentsStyle();
+
+        // Ajout des pictogrammes de vigilance
+        const markersLayer = L.layerGroup().addTo(mapRef.current!);
+
+        // Créer une map pour une recherche rapide de la vigilance la plus haute par département
+        const topVigilanceMap = vigilances.reduce((acc, v) => {
+          if (!acc[v.domain_id] || v.color_id > acc[v.domain_id].color_id) {
+            acc[v.domain_id] = v;
+          }
+          return acc;
+        }, {} as Record<string, Vigilance>);
+
+        geoJsonLayerRef.current?.eachLayer(layer => {
+          const feature = (layer as any).feature as Department | undefined;
+          const deptCode = feature?.properties?.code;
+
+          if (deptCode) {
+            const vigilance = topVigilanceMap[deptCode];
+            // S'assurer que la couche est un chemin (polygone, etc.) avant d'appeler getBounds
+            if (vigilance && layer instanceof L.Path) {
+              // Calcul de la taille de l'icône en fonction de la taille du département
+              const bounds = (layer as any).getBounds();
+              const diagonal = bounds.getSouthWest().distanceTo(bounds.getNorthEast()); // en mètres
+              const minSize = 20; // Taille min en pixels
+              const maxSize = 40; // Taille max en pixels
+              const minDiag = 70000; // 50km, taille de réf pour un petit département (+20)
+              const maxDiag = 600000; // 400km, taille de réf pour un grand département(+200)
+              const scale = Math.max(0, Math.min(1, (diagonal - minDiag) / (maxDiag - minDiag)));
+              const size = Math.round(minSize + scale * (maxSize - minSize));
+
+              // Utilisation de 'as any' en dernier recours pour contourner un problème de linter persistant.
+              const center = (layer as any).getBounds().getCenter();
+              const icon = createVigilanceIcon(vigilance.phenomenon_id, size);
+              if (icon) {
+                L.marker(center, { icon }).addTo(markersLayer);
+              }
+            }
+          }
+        });
 
         // Recentrer la carte
         mapRef.current.fitBounds(FRANCE_BOUNDS, {
@@ -202,4 +254,19 @@ export function Map({ vigilances }: MapProps) {
       }}
     />
   );
+}
+
+// Fonction pour créer une icône de vigilance personnalisée à partir d'un fichier image
+function createVigilanceIcon(phenomenonId: number, size: number): L.Icon | null {
+  const iconFilename = PHENOMENON_ICON_MAP[phenomenonId];
+  if (!iconFilename) {
+    return null; // Pas de pictogramme défini pour ce phénomène
+  }
+
+  return L.icon({
+    iconUrl: `/${iconFilename}`,
+    iconSize: [size, size], // Taille dynamique
+    iconAnchor: [size / 2, size / 2], // Point d'ancrage au centre
+    className: 'vigilance-pictogram-icon',
+  });
 } 
