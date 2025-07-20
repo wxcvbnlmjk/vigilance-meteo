@@ -19,7 +19,7 @@ const formatDate = (dateStr: string) => {
 
 // Mappage entre l'ID du phénomène et le nom du fichier image correspondant
 const PHENOMENON_ICON_MAP: Record<number, string> = {
-  1: 'vent violent.png',
+  1: 'vent_violent.png',
   2: 'pluie-inondation.png',
   3: 'orage.png', // Corrigé depuis 'orages.png' pour correspondre au nom de fichier
   4: 'inondation.png',
