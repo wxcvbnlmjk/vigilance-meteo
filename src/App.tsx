@@ -235,7 +235,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-base-100">
-      <header className="navbar bg-base-200 shadow-lg">
+      <header className="navbar bg-base-200 shadow-lg min-h-8 py-1">
         <div className="flex-1">
           <h1 className="text-xl font-bold px-4">Vigilances Météo</h1>
         </div>
@@ -245,15 +245,15 @@ function App() {
       </header>
 
       <main className="container mx-auto p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
           {/* Filtres */}
-          <div className="md:col-span-1 space-y-4">
+          <div className="md:col-span-1 space-y-2">
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Date</span>
+              <label className="label min-h-6 py-1">
+                <span className="label-text text-sm">Date</span>
               </label>
               <select 
-                className="select select-bordered w-full"
+                className="select select-bordered w-full h-8 text-sm"
                 value={selectedDate}
                 onChange={e => setSelectedDate(e.target.value)}
               >
@@ -263,11 +263,11 @@ function App() {
             </div>
 
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Département</span>
+              <label className="label min-h-6 py-1">
+                <span className="label-text text-sm">Département</span>
               </label>
               <select 
-                className="select select-bordered w-full"
+                className="select select-bordered w-full h-8 text-sm"
                 value={filters.department || ''}
                 onChange={handleDepartmentChange}
               >
@@ -281,11 +281,11 @@ function App() {
             </div>
 
             <div className="form-control">
-              <label className="label">
-                <span className="label-text">Type de vigilance</span>
+              <label className="label min-h-6 py-1">
+                <span className="label-text text-sm">Type de vigilance</span>
               </label>
               <select 
-                className="select select-bordered w-full"
+                className="select select-bordered w-full h-8 text-sm"
                 value={filters.phenomenonType || ''}
                 onChange={handlePhenomenonChange}
               >
