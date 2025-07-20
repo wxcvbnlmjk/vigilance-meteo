@@ -111,7 +111,27 @@ const DEPARTMENTS: Record<string, string> = {
   "95": "Val-d'Oise"
 };
 
+const getTodayRange = () => {
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
+  return { date_debut: start.toLocaleDateString("fr-FR"), date_fin: end.toLocaleDateString("fr-FR") };
+};
+
+const getTomorrowRange = () => {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(start.getDate() + 1);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setHours(23, 59, 59, 999);
+  return { date_debut: start.toLocaleDateString("fr-FR"), date_fin: end.toLocaleDateString("fr-FR") };
+};
+
 function App() {
+  const [selectedDate, setSelectedDate] = useState<string>('today');
   // const [vigilances, setVigilances] = useState<Vigilance[]>([]);
   const [filters, setFilters] = useState<VigilanceFilters>({});
   const [filteredVigilances, setFilteredVigilances] = useState<Vigilance[]>([]);
@@ -124,8 +144,14 @@ function App() {
 
   // Charger les vigilances
   useEffect(() => {
+    let range = { date_debut: '', date_fin: '' };
+    if (selectedDate === 'today') {
+      range = getTodayRange();
+    } else if (selectedDate === 'tomorrow') {
+      range = getTomorrowRange();
+    }
     const loadVigilances = async () => {
-      const data = await getVigilances();
+      const data = await getVigilances(range.date_debut, range.date_fin);
       
       // Filtrer pour exclure FRA des vigilances
       const filteredData = data.filter(v => v.domain_id !== 'FRA');
@@ -165,7 +191,7 @@ function App() {
     };
 
     loadVigilances();
-  }, []);
+  }, [selectedDate]);
 
   // Mettre à jour les vigilances filtrées quand les filtres changent
   useEffect(() => {
@@ -222,6 +248,20 @@ function App() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Filtres */}
           <div className="md:col-span-1 space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Date</span>
+              </label>
+              <select 
+                className="select select-bordered w-full"
+                value={selectedDate}
+                onChange={e => setSelectedDate(e.target.value)}
+              >
+                <option value="today">Aujourd'hui</option>
+                <option value="tomorrow">Demain</option>
+              </select>
+            </div>
+
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Département</span>
