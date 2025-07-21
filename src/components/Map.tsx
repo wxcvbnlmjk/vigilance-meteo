@@ -42,8 +42,8 @@ const DEPARTMENTS_GEOJSON_URL = 'https://raw.githubusercontent.com/gregoiredavid
 
 // Coordonnées de la France métropolitaine
 const FRANCE_BOUNDS_COORDS = [
-  [41.333, -5.142], // Sud-Ouest
-  [50.7509, 9.561]  // Nord-Est  8.861
+  [41.0, -6.3], // Sud-Ouest (plus bas et plus à l'ouest pour inclure la Corse et la Bretagne)
+  [51.5, 11.1]  // Nord-Est (plus haut et plus à l'est)
 ] as [[number, number], [number, number]];
 
 const FRANCE_BOUNDS = L.latLngBounds(
@@ -80,8 +80,8 @@ export function Map({ vigilances }: MapProps) {
     // Créer une nouvelle carte
     mapRef.current = L.map(mapContainer.current, {
       center: FRANCE_CENTER,
-      zoom: 6,
-      minZoom: 5,
+      zoom: 4.5,
+      minZoom: 4.5,
       maxZoom: 9,
       zoomControl: true,
       dragging: true,

@@ -135,3 +135,74 @@ La hauteur de la carte a été réduite d'un tiers, passant de 600px à 400px. L
 
 ---
 
+_**User**_
+
+zoomer pour que toute la france de la bretagne a la corse entre dans la map
+
+---
+
+_**Assistant**_
+
+<details>
+            <summary>Searched codebase "Comment les coordonnées et le zoom initial de la carte sont-ils définis pour afficher la France ?" • **9** results</summary>
+        
+| File | Lines |
+|------|-------|
+| `src/components/Map.tsx` | L58-102 |
+| `src/components/Map.tsx` | L18-58 |
+| `src/components/Map.tsx` | L131-174 |
+| `src/components/Map.tsx` | L1-18 |
+| `src/components/Map.tsx` | L102-131 |
+| `src/components/Map.tsx` | L217-257 |
+| `src/components/Map.tsx` | L174-217 |
+| `src/components/Map.tsx` | L257-272 |
+| `src/components/ThemeToggle.tsx` | L1-39 |
+
+</details>
+
+---
+
+```diff
+  // Coordonnées de la France métropolitaine
+  const FRANCE_BOUNDS_COORDS = [
+-   [41.333, -5.142], // Sud-Ouest
+-   [50.7509, 9.561]  // Nord-Est  8.861
++   [41.0, -5.5], // Sud-Ouest (plus bas et plus à l'ouest pour inclure la Corse et la Bretagne)
++   [51.5, 10.0]  // Nord-Est (plus haut et plus à l'est)
+  ] as [[number, number], [number, number]];
+  
+```
+
+---
+
+La carte est maintenant zoomée et centrée pour inclure toute la France, de la Bretagne à la Corse, grâce à l'élargissement des bornes géographiques. Toute la métropole et la Corse seront visibles sans découpage.
+
+Dis-moi si tu veux ajuster encore la vue ou la zone affichée !
+
+---
+
+_**User**_
+
+reduire les marges de droite et gauche de l app de moitier
+
+---
+
+_**Assistant**_
+
+```diff
+        </header>
+  
+-       <main className="container mx-auto p-4">
++       <main className="container mx-auto px-2 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+            {/* Filtres */}
+```
+
+---
+
+Les marges latérales (droite et gauche) de l'application ont été réduites de moitié. L'espace horizontal autour du contenu principal est donc plus étroit, ce qui laisse plus de place à la carte et aux filtres.
+
+Si tu veux un ajustement encore plus précis (par exemple une valeur exacte en pixels), précise-le simplement !
+
+---
+

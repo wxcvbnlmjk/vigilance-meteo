@@ -247,7 +247,7 @@ function App() {
         </div>
       </header>
 
-      <main className="container mx-auto p-4">
+      <main className="container mx-auto px-2 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
           {/* Filtres */}
           <div className="md:col-span-1 space-y-2">
