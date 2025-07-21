@@ -136,6 +136,7 @@ function App() {
   const [filters, setFilters] = useState<VigilanceFilters>({});
   const [filteredVigilances, setFilteredVigilances] = useState<Vigilance[]>([]);
   const [allVigilances, setAllVigilances] = useState<Vigilance[]>([]);
+  const [loading, setLoading] = useState<boolean>(false); // Ajout de l'état de chargement
   
   // Listes uniques pour les filtres
   // const [uniqueDates, setUniqueDates] = useState<string[]>([]);
@@ -151,6 +152,7 @@ function App() {
       range = getTomorrowRange();
     }
     const loadVigilances = async () => {
+      setLoading(true); // Début du chargement
       const data = await getVigilances(range.date_debut, range.date_fin);
       
       // Filtrer pour exclure FRA des vigilances
@@ -188,6 +190,7 @@ function App() {
       // setUniqueDates(dates);
       setUniqueDepartments(departments);
       setUniquePhenomena(phenomena);
+      setLoading(false); // Fin du chargement
     };
 
     loadVigilances();
@@ -300,8 +303,15 @@ function App() {
           </div>
 
           {/* Carte */}
-          <div className="md:col-span-3 bg-base-200 rounded-lg relative" style={{ height: '600px' }}>
-            <Map vigilances={filteredVigilances} />
+          <div className="md:col-span-3 bg-base-200 rounded-lg relative" style={{ height: '400px' }}>
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <span className="loading loading-spinner loading-lg text-primary" />
+                {/* <span className="ml-4 text-lg">Chargement des vigilances météo...</span> */}
+              </div>
+            ) : (
+              <Map vigilances={filteredVigilances} />
+            )}
           </div>
       </div>
       </main>

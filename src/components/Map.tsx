@@ -42,8 +42,8 @@ const DEPARTMENTS_GEOJSON_URL = 'https://raw.githubusercontent.com/gregoiredavid
 
 // Coordonnées de la France métropolitaine
 const FRANCE_BOUNDS_COORDS = [
-  [39.333, -5.142], // Sud-Ouest
-  [48.7509, 9.561]  // Nord-Est  8.861
+  [41.333, -5.142], // Sud-Ouest
+  [50.7509, 9.561]  // Nord-Est  8.861
 ] as [[number, number], [number, number]];
 
 const FRANCE_BOUNDS = L.latLngBounds(
