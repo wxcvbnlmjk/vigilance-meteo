@@ -252,7 +252,34 @@ export function Map({ vigilances }: MapProps) {
         borderRadius: '0.5rem',
         overflow: 'hidden'
       }}
-    />
+    >
+      {/* Badge GitHub en bas à gauche */}
+      <div 
+        style={{
+          position: 'absolute',
+          bottom: '10px',
+          left: '10px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '4px',
+          padding: '2px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        <a 
+          href="https://github.com/wxcvbnlmjk/vigilance-meteo" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
+        >
+          <img 
+            src="https://img.shields.io/github/last-commit/wxcvbnlmjk/vigilance-meteo" 
+            alt="Dernier commit GitHub"
+            style={{ display: 'block' }}
+          />
+        </a>
+      </div>
+    </div>
   );
 }
 

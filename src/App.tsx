@@ -137,14 +137,77 @@ function App() {
   const [filteredVigilances, setFilteredVigilances] = useState<Vigilance[]>([]);
   const [allVigilances, setAllVigilances] = useState<Vigilance[]>([]);
   const [loading, setLoading] = useState<boolean>(false); // Ajout de l'état de chargement
+  const [isTestMode, setIsTestMode] = useState<boolean>(false); // Ajout de l'état mode test
   
   // Listes uniques pour les filtres
   // const [uniqueDates, setUniqueDates] = useState<string[]>([]);
   const [uniqueDepartments, setUniqueDepartments] = useState<Department[]>([]);
   const [uniquePhenomena, setUniquePhenomena] = useState<{id: number, name: string}[]>([]);
 
+  // Fonction pour charger les données de test
+  const loadTestData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/test.json');
+      const data = await response.json();
+      
+      // Convertir les données du format test.json vers le format Vigilance
+      const testVigilances: Vigilance[] = data.results.map((item: any) => ({
+        domain_id: item.domain_id,
+        echeance: item.echeance,
+        phenomenon_id: item.phenomenon_id,
+        phenomenon: item.phenomenon,
+        color_id: item.color_id,
+        color: item.color,
+        begin_time: item.begin_time,
+        end_time: item.end_time,
+        product_datetime: item.product_datetime
+      }));
+
+      setAllVigilances(testVigilances);
+      setFilteredVigilances(testVigilances);
+      setIsTestMode(true);
+
+      // Extraire les valeurs uniques pour les filtres
+      const departmentSet = new Set();
+      const departments = testVigilances
+        .filter(v => v.domain_id !== 'FRA')
+        .reduce((acc, v) => {
+          if (!departmentSet.has(v.domain_id)) {
+            departmentSet.add(v.domain_id);
+            acc.push({
+              code: v.domain_id,
+              name: DEPARTMENTS[v.domain_id] || v.domain_id
+            });
+          }
+          return acc;
+        }, [] as { code: string; name: string }[])
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr-FR'));
+
+      const phenomena = [...new Set(testVigilances.map(v => 
+        JSON.stringify({ id: v.phenomenon_id, name: v.phenomenon })
+      ))].map(str => JSON.parse(str));
+
+      setUniqueDepartments(departments);
+      setUniquePhenomena(phenomena);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données de test:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fonction pour revenir aux données réelles
+  const loadRealData = () => {
+    setIsTestMode(false);
+    // Déclencher le rechargement des données réelles
+    setSelectedDate(selectedDate);
+  };
+
   // Charger les vigilances
   useEffect(() => {
+    if (isTestMode) return; // Ne pas charger les données réelles si on est en mode test
+    
     let range = { date_debut: '', date_fin: '' };
     if (selectedDate === 'today') {
       range = getTodayRange();
@@ -194,7 +257,7 @@ function App() {
     };
 
     loadVigilances();
-  }, [selectedDate]);
+  }, [selectedDate, isTestMode]);
 
   // Mettre à jour les vigilances filtrées quand les filtres changent
   useEffect(() => {
@@ -242,7 +305,15 @@ function App() {
         <div className="flex-1">
           <h1 className="text-xl font-bold px-4">Vigilances Météo</h1>
         </div>
-        <div className="flex-none">
+        <div className="flex-none flex items-center gap-2">
+          {/* Bouton de test */}
+          <button 
+            className={`btn btn-sm ${isTestMode ? 'btn-success' : 'btn-outline'}`}
+            onClick={isTestMode ? loadRealData : loadTestData}
+            disabled={loading}
+          >
+            {isTestMode ? 'Données Réelles' : 'Mode Test'}
+          </button>
           <ThemeToggle />
         </div>
       </header>
@@ -259,6 +330,7 @@ function App() {
                 className="select select-bordered w-full h-8 text-sm"
                 value={selectedDate}
                 onChange={e => setSelectedDate(e.target.value)}
+                disabled={isTestMode}
               >
                 <option value="today">Aujourd'hui</option>
                 <option value="tomorrow">Demain</option>
