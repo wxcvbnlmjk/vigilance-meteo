@@ -257,7 +257,7 @@ export function Map({ vigilances }: MapProps) {
       <div 
         style={{
           position: 'absolute',
-          bottom: '10px',
+          bottom: '20px',
           left: '10px',
           zIndex: 1000,
           backgroundColor: 'rgba(255, 255, 255, 0.9)',
