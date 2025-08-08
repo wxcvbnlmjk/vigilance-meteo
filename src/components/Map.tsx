@@ -19,15 +19,15 @@ const formatDate = (dateStr: string) => {
 
 // Mappage entre l'ID du phénomène et le nom du fichier image correspondant
 const PHENOMENON_ICON_MAP: Record<number, string> = {
-  1: 'vent_violent.png',
-  2: 'pluie-inondation.png',
-  3: 'orage.png', // Corrigé depuis 'orages.png' pour correspondre au nom de fichier
-  4: 'inondation.png',
-  5: 'neige-verglas.png',
-  6: 'canicule.png',
-  7: 'canicule.png', // Fallback pour 'grand-froid.png' qui est manquant
-  8: 'avalanches.png',
-  9: 'vagues-submersion.png',
+  1: '🌪️',
+  2: '🌧️',
+  3: '⚡', // Corrigé depuis 'orages.png' pour correspondre au nom de fichier
+  4: '🌊',
+  5: '❄️',
+  6: '🌡️',
+  7: '🌡️', // Fallback pour 'grand-froid.png' qui est manquant
+  8: '🏔️',
+  9: '🌊',
 };
 
 // Couleurs des vigilances avec leurs labels
@@ -61,6 +61,8 @@ export function Map({ vigilances }: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const markersRef = useRef<Record<string, L.Marker>>({});
   const [mapKey, setMapKey] = useState(0); // Ajout d'une clé pour forcer le remontage
 
   // Effet pour réinitialiser la carte quand les vigilances changent
@@ -120,7 +122,7 @@ export function Map({ vigilances }: MapProps) {
         updateDepartmentsStyle();
 
         // Ajout des pictogrammes de vigilance
-        const markersLayer = L.layerGroup().addTo(mapRef.current!);
+        markersLayerRef.current = L.layerGroup().addTo(mapRef.current!);
 
         // Créer une map pour une recherche rapide de la vigilance la plus haute par département
         const topVigilanceMap = vigilances.reduce((acc, v) => {
@@ -146,16 +148,60 @@ export function Map({ vigilances }: MapProps) {
               const minDiag = 70000; // 50km, taille de réf pour un petit département (+20)
               const maxDiag = 600000; // 400km, taille de réf pour un grand département(+200)
               const scale = Math.max(0, Math.min(1, (diagonal - minDiag) / (maxDiag - minDiag)));
-              const size = Math.round(minSize + scale * (maxSize - minSize));
+              const baseSize = Math.round(minSize + scale * (maxSize - minSize));
 
               // Utilisation de 'as any' en dernier recours pour contourner un problème de linter persistant.
               const center = (layer as any).getBounds().getCenter();
-              const icon = createVigilanceIcon(vigilance.phenomenon_id, size);
+              const icon = createVigilanceIcon(vigilance.phenomenon_id, baseSize, mapRef.current?.getZoom() || 4.5);
               if (icon) {
-                L.marker(center, { icon }).addTo(markersLayer);
+                const marker = L.marker(center, { icon }).addTo(markersLayerRef.current!);
+                markersRef.current[deptCode] = marker;
               }
             }
           }
+        });
+
+        // Ajouter un écouteur d'événement de zoom pour mettre à jour la taille des emojis
+        let zoomTimeout: NodeJS.Timeout;
+        mapRef.current.on('zoomend', () => {
+          // Annuler le timeout précédent pour éviter les conflits
+          clearTimeout(zoomTimeout);
+          
+          zoomTimeout = setTimeout(() => {
+            const currentZoom = mapRef.current?.getZoom() || 4.5;
+            
+            // Supprimer tous les marqueurs existants
+            Object.values(markersRef.current).forEach(marker => {
+              marker.remove();
+            });
+            markersRef.current = {};
+            
+            // Recréer tous les marqueurs avec la nouvelle taille
+            geoJsonLayerRef.current?.eachLayer(layer => {
+              const feature = (layer as any).feature as Department | undefined;
+              const deptCode = feature?.properties?.code;
+
+              if (deptCode) {
+                const vigilance = topVigilanceMap[deptCode];
+                if (vigilance && layer instanceof L.Path) {
+                  const bounds = (layer as any).getBounds();
+                  const diagonal = bounds.getSouthWest().distanceTo(bounds.getNorthEast());
+                  const minSize = 20;
+                  const maxSize = 40;
+                  const minDiag = 70000;
+                  const maxDiag = 600000;
+                  const scale = Math.max(0, Math.min(1, (diagonal - minDiag) / (maxDiag - minDiag)));
+                  const baseSize = Math.round(minSize + scale * (maxSize - minSize));
+                  const center = bounds.getCenter();
+                  const icon = createVigilanceIcon(vigilance.phenomenon_id, baseSize, currentZoom);
+                  if (icon) {
+                    const marker = L.marker(center, { icon }).addTo(markersLayerRef.current!);
+                    markersRef.current[deptCode] = marker;
+                  }
+                }
+              }
+            });
+          }, 50); // Petit délai pour s'assurer que le zoom est terminé
         });
 
         // Recentrer la carte
@@ -283,17 +329,34 @@ export function Map({ vigilances }: MapProps) {
   );
 }
 
-// Fonction pour créer une icône de vigilance personnalisée à partir d'un fichier image
-function createVigilanceIcon(phenomenonId: number, size: number): L.Icon | null {
-  const iconFilename = PHENOMENON_ICON_MAP[phenomenonId];
-  if (!iconFilename) {
+// Fonction pour créer une icône de vigilance personnalisée à partir d'un fichier image ou d'un emoji
+function createVigilanceIcon(phenomenonId: number, size: number, zoom: number = 4.5): L.Icon | L.DivIcon | null {
+  const iconValue = PHENOMENON_ICON_MAP[phenomenonId];
+  if (!iconValue) {
     return null; // Pas de pictogramme défini pour ce phénomène
   }
 
-  return L.icon({
-    iconUrl: `/${iconFilename}`,
-    iconSize: [size, size], // Taille dynamique
-    iconAnchor: [size / 2, size / 2], // Point d'ancrage au centre
-    className: 'vigilance-pictogram-icon',
-  });
+  // Vérifier si c'est un emoji (contient des caractères Unicode)
+  const isEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(iconValue);
+
+  if (isEmoji) {
+    // Utiliser divIcon pour les emojis
+    // Calculer la taille en fonction du zoom (plus le zoom est élevé, plus l'emoji est gros)
+    const zoomFactor = Math.pow(1.5, zoom - 4.5); // Facteur de zoom basé sur le niveau de zoom
+    const emojiSize = Math.round((size / 2) * zoomFactor);
+    return L.divIcon({
+      html: `<div style="font-size: ${emojiSize}px; text-align: center; line-height: ${emojiSize}px; width: ${emojiSize}px; height: ${emojiSize}px; background: transparent; border: none;">${iconValue}</div>`,
+      iconSize: [emojiSize, emojiSize],
+      iconAnchor: [emojiSize / 2, emojiSize / 2],
+      className: `vigilance-pictogram-icon-${phenomenonId}-${zoom}`,
+    });
+  } else {
+    // Utiliser icon pour les images
+    return L.icon({
+      iconUrl: `/${iconValue}`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
+      className: 'vigilance-pictogram-icon',
+    });
+  }
 } 
