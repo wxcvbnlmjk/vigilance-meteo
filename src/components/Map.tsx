@@ -94,7 +94,7 @@ export function Map({ vigilances }: MapProps) {
     // Ajouter la couche OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap'
     }).addTo(mapRef.current);
 
     // S'assurer que la vue est centrée sur la France
@@ -303,7 +303,7 @@ export function Map({ vigilances }: MapProps) {
       <div 
         style={{
           position: 'absolute',
-          bottom: '20px',
+          bottom: '10px',
           left: '10px',
           zIndex: 1000,
           backgroundColor: 'rgba(255, 255, 255, 0.9)',
