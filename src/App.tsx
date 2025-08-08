@@ -117,7 +117,10 @@ const getTodayRange = () => {
   start.setHours(0, 0, 0, 0);
   const end = new Date(now);
   end.setHours(23, 59, 59, 999);
-  return { date_debut: start.toLocaleDateString("fr-FR"), date_fin: end.toLocaleDateString("fr-FR") };
+  return { 
+    date_debut: start.toISOString().split('T')[0], 
+    date_fin: end.toISOString().split('T')[0] 
+  };
 };
 
 const getTomorrowRange = () => {
@@ -127,7 +130,10 @@ const getTomorrowRange = () => {
   start.setHours(0, 0, 0, 0);
   const end = new Date(start);
   end.setHours(23, 59, 59, 999);
-  return { date_debut: start.toLocaleDateString("fr-FR"), date_fin: end.toLocaleDateString("fr-FR") };
+  return { 
+    date_debut: start.toISOString().split('T')[0], 
+    date_fin: end.toISOString().split('T')[0] 
+  };
 };
 
 function App() {
