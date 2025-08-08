@@ -1,62 +1,168 @@
-# Synthèse de l'Application "Vigilances Météo"
+# 🌤️ Vigilance Météo
 
-## Description Générale
-L'application "Vigilances Météo" est une application web qui permet de visualiser les vigilances météorologiques en France. Elle utilise une carte interactive pour afficher les alertes météorologiques par département, avec des filtres pour affiner les résultats par date, département, et type de phénomène météorologique.
+Une application web interactive pour visualiser les vigilances météorologiques en France en temps réel.
 
-## Technologies Utilisées
-- **Framework Frontend**: React (v19)
-- **Bundler**: Vite
-- **Styling**: Tailwind CSS avec DaisyUI
-- **Cartographie**: Leaflet
-- **Typage**: TypeScript
-- **Linting**: ESLint avec des plugins pour React Hooks et React Refresh
-- **Gestion des dépendances**: npm
+## 📋 Description
 
-## Structure du Projet
+Vigilance Météo est une application React qui affiche sur une carte interactive les alertes météorologiques émises par Météo-France. L'application permet de visualiser les différents niveaux de vigilance (jaune, orange, rouge) pour tous les départements français, avec des pictogrammes spécifiques pour chaque type de phénomène météorologique.
 
-### Fichiers de Configuration
-- **`eslint.config.js`**: Configuration d'ESLint pour le linting du code, avec des règles spécifiques pour React et TypeScript.
-- **`tailwind.config.js`**: Configuration de Tailwind CSS avec le plugin DaisyUI.
-- **`tsconfig.json`**, **`tsconfig.app.json`**, **`tsconfig.node.json`**: Configuration de TypeScript pour le projet, avec des options spécifiques pour le frontend et le backend.
-- **`vite.config.ts`**: Configuration de Vite pour le développement et la production, avec des alias pour les imports et des options de serveur.
+## ✨ Fonctionnalités
 
-### Fichiers Principaux
-- **`index.html`**: Point d'entrée de l'application, incluant les scripts et styles nécessaires.
-- **`package.json`**: Liste des dépendances et scripts pour le développement, la construction, et le linting du projet.
+### 🗺️ Carte Interactive
+- **Carte Leaflet** centrée sur la France métropolitaine
+- **Départements colorés** selon le niveau de vigilance le plus élevé
+- **Pictogrammes dynamiques** pour chaque type de phénomène météorologique
+- **Popups informatifs** avec détails des vigilances par département
+- **Zoom et navigation** limités à la France
 
-### Composants Principaux
-- **`App.tsx`**: Composant principal de l'application, gérant l'état des vigilances et des filtres, et affichant l'interface utilisateur.
-- **`Map.tsx`**: Composant qui affiche une carte Leaflet avec les vigilances météorologiques par département.
-- **`vigilanceApi.ts`**: Service pour récupérer les données des vigilances météorologiques depuis une API publique.
+### 🔍 Filtres et Recherche
+- **Sélection de date** : Aujourd'hui ou Demain
+- **Filtre par département** : Liste complète des départements français
+- **Filtre par type de phénomène** : Vent, Orages, Pluie, Canicule, Neige/Verglas, etc.
+- **Filtres combinables** pour affiner la recherche
 
-### Styles
-- **`App.css`**: Styles spécifiques à l'application, incluant des animations et des styles pour les composants.
-- **`index.css`**: Styles globaux, incluant des styles pour Leaflet et les popups de vigilance.
+### 🎨 Interface Utilisateur
+- **Design responsive** adapté mobile et desktop
+- **Thème sombre/clair** avec toggle automatique
+- **Interface moderne** avec DaisyUI
+- **Indicateurs visuels** clairs pour les niveaux de vigilance
 
-### Types
-- **`vigilance.ts`**: Définition des types TypeScript pour les vigilances et les filtres.
-- **`geojson.ts`**: Définition des types TypeScript pour les données GeoJSON des départements français.
+### 🧪 Mode Test
+- **Bouton de test** pour charger des données de démonstration
+- **Données statiques** pour tester l'application hors ligne
+- **Basculement facile** entre données réelles et de test
 
-## Fonctionnalités Principales
-1. **Carte Interactive**:
-   - Affichage des départements français avec des couleurs correspondant aux niveaux de vigilance.
-   - Popups interactifs avec des détails sur les vigilances (date, phénomène, niveau de vigilance).
+### 📊 Types de Vigilances Supportés
+- 🌪️ **Vent violent**
+- 🌧️ **Pluie-inondation**
+- ⚡ **Orages**
+- 🌊 **Inondation**
+- ❄️ **Neige-verglas**
+- 🌡️ **Canicule**
+- 🏔️ **Avalanches**
+- 🌊 **Vagues-submersion**
 
-2. **Filtres**:
-   - Filtrage des vigilances par date, département, et type de phénomène météorologique.
-   - Les filtres sont dynamiquement mis à jour en fonction des données disponibles.
+## 🛠️ Technologies Utilisées
 
-3. **Récupération des Données**:
-   - Les données des vigilances sont récupérées depuis une API publique et filtrées pour n'afficher que les vigilances actives.
+### Frontend
+- **React 19** - Framework JavaScript pour l'interface utilisateur
+- **TypeScript** - Typage statique pour une meilleure maintenabilité
+- **Vite** - Outil de build rapide et moderne
 
-4. **Responsive Design**:
-   - L'interface est conçue pour être responsive, avec une disposition adaptée aux écrans de différentes tailles.
+### Cartographie
+- **Leaflet** - Bibliothèque de cartographie interactive
+- **OpenStreetMap** - Données cartographiques gratuites
 
-## Développement et Déploiement
-- **Développement**: Utilisation de Vite pour un développement rapide avec Hot Module Replacement (HMR).
-- **Linting**: ESLint est configuré pour assurer la qualité du code avec des règles spécifiques pour React et TypeScript.
-- **Construction**: Le projet peut être construit pour la production avec la commande `npm run build`.
-- **Prévisualisation**: La version de production peut être prévisualisée avec la commande `npm run preview`.
+### Styling
+- **Tailwind CSS** - Framework CSS utilitaire
+- **DaisyUI** - Composants UI prêts à l'emploi
+- **CSS Modules** - Styles modulaires
 
-## Conclusion
-L'application "Vigilances Météo" est un outil utile pour visualiser les alertes météorologiques en France. Elle combine des technologies modernes comme React, TypeScript, et Leaflet pour offrir une expérience utilisateur fluide et interactive. Les filtres dynamiques et la carte interactive en font un outil puissant pour suivre les vigilances météorologiques en temps réel.
+### API et Données
+- **API Météo-France** - Données de vigilance météorologique
+- **GeoJSON** - Format pour les données géographiques des départements
+
+### Outils de Développement
+- **ESLint** - Linting du code
+- **TypeScript ESLint** - Règles TypeScript
+- **React Hooks** - Gestion d'état moderne
+
+## 🚀 Installation et Démarrage
+
+### Prérequis
+- Node.js (version 18 ou supérieure)
+- npm ou yarn
+
+### Installation
+```bash
+# Cloner le repository
+git clone https://github.com/wxcvbnlmjk/vigilance-meteo.git
+cd vigilance-meteo
+
+# Installer les dépendances
+npm install
+```
+
+### Démarrage en développement
+```bash
+# Lancer le serveur de développement
+npm run dev
+```
+
+L'application sera accessible à l'adresse `http://localhost:5173`
+
+### Build de production
+```bash
+# Construire l'application pour la production
+npm run build
+
+# Prévisualiser le build
+npm run preview
+```
+
+## 📁 Structure du Projet
+
+```
+vigilance-meteo/
+├── public/                 # Assets statiques
+│   ├── *.png              # Pictogrammes de vigilance
+│   └── test.json          # Données de test
+├── src/
+│   ├── components/        # Composants React
+│   │   ├── Map.tsx       # Composant carte principale
+│   │   └── ThemeToggle.tsx # Toggle thème sombre/clair
+│   ├── services/          # Services API
+│   │   └── vigilanceApi.ts # Service API Météo-France
+│   ├── types/             # Définitions TypeScript
+│   │   ├── vigilance.ts   # Types pour les vigilances
+│   │   └── geojson.ts     # Types pour les données géographiques
+│   ├── App.tsx           # Composant principal
+│   └── main.tsx          # Point d'entrée
+├── package.json          # Dépendances et scripts
+├── tailwind.config.js    # Configuration Tailwind
+└── vite.config.ts        # Configuration Vite
+```
+
+## 🎯 Fonctionnalités Techniques
+
+### Gestion d'État
+- **useState** pour l'état local des composants
+- **useEffect** pour les effets de bord et appels API
+- **useRef** pour les références DOM et Leaflet
+
+### Performance
+- **Lazy loading** des données de vigilance
+- **Optimisation des re-renders** avec des dépendances appropriées
+- **Gestion efficace** des couches Leaflet
+
+### Accessibilité
+- **Labels appropriés** pour les éléments interactifs
+- **Contraste** adapté aux thèmes sombre/clair
+- **Navigation clavier** supportée
+
+## 🔗 Liens Utiles
+
+- **Repository GitHub** : [https://github.com/wxcvbnlmjk/vigilance-meteo](https://github.com/wxcvbnlmjk/vigilance-meteo)
+- **API Météo-France** : [https://donneespubliques.meteofrance.fr/](https://donneespubliques.meteofrance.fr/)
+- **Documentation Leaflet** : [https://leafletjs.com/](https://leafletjs.com/)
+
+## 📝 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+1. Fork le projet
+2. Créer une branche pour votre fonctionnalité
+3. Commiter vos changements
+4. Pousser vers la branche
+5. Ouvrir une Pull Request
+
+## 📞 Support
+
+Pour toute question ou problème, n'hésitez pas à ouvrir une issue sur GitHub.
+
+---
+
+**Développé avec ❤️ pour la communauté météorologique française**
