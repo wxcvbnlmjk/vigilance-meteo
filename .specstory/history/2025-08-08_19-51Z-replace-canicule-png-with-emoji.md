@@ -751,3 +751,65 @@ Cette solution devrait maintenant fonctionner parfaitement sans duplication d'em
 
 ---
 
+_**User**_
+
+chager <link rel="icon" type="image/svg+xml" href="/wi-thunderstorm.svg" />
+pour utiliser cet  emoji
+🌧️
+
+---
+
+_**Assistant**_
+
+Je vais modifier le fichier `index.html` pour utiliser l'emoji 🌧️ comme favicon au lieu de l'image SVG.
+
+
+---
+
+Read file: index.html
+
+---
+
+Je vais maintenant modifier la ligne du favicon pour utiliser l'emoji 🌧️. Pour cela, je vais utiliser un favicon en base64 qui contient l'emoji :
+
+
+---
+
+<details><summary>Edit file: index.html</summary>
+
+undefined
+
+**Chunk 1**
+Lines added: 1, lines removed: 1
+
+```diff
+@@ -3,5 +3,5 @@
+    <head>
+      <meta charset="UTF-8" />
+-     <link rel="icon" type="image/svg+xml" href="/wi-thunderstorm.svg" />
++     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌧️</text></svg>" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Vigilances Météo</title>
+```
+
+</details>
+
+---
+
+Parfait ! J'ai modifié le favicon pour utiliser l'emoji 🌧️. Voici ce que j'ai fait :
+
+## Modification apportée :
+
+J'ai remplacé la référence vers le fichier SVG `/wi-thunderstorm.svg` par un favicon inline qui utilise l'emoji 🌧️. Le nouveau favicon est créé avec :
+
+- **Format SVG inline** : Utilise un élément `<text>` SVG pour afficher l'emoji
+- **Encodage direct** : L'emoji 🌧️ est directement intégré dans le SVG
+- **Taille optimisée** : L'emoji occupe 90% de la zone de 100x100 pixels
+- **Compatibilité** : Fonctionne dans tous les navigateurs modernes
+
+## Résultat :
+
+Maintenant, l'onglet du navigateur affichera l'emoji 🌧️ comme favicon au lieu de l'icône d'orage SVG. Cela correspond bien au thème météorologique de l'application et utilise le même emoji que celui utilisé pour les phénomènes de pluie-inondation sur la carte !
+
+---
+
