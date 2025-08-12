@@ -110,32 +110,7 @@ const DEPARTMENTS: Record<string, string> = {
   "94": "Val-de-Marne",
   "95": "Val-d'Oise"
 };
-
-const getTodayRange = () => {
-  const now = new Date();
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(now);
-  end.setHours(23, 59, 59, 999);
-  return { 
-    date_debut: start.toISOString().split('T')[0], 
-    date_fin: end.toISOString().split('T')[0] 
-  };
-};
-
-const getTomorrowRange = () => {
-  const now = new Date();
-  const start = new Date(now);
-  start.setDate(start.getDate() + 1);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setHours(23, 59, 59, 999);
-  return { 
-    date_debut: start.toISOString().split('T')[0], 
-    date_fin: end.toISOString().split('T')[0] 
-  };
-};
-
+ 
 function App() {
   const [selectedDate, setSelectedDate] = useState<string>('today');
   // const [vigilances, setVigilances] = useState<Vigilance[]>([]);
@@ -214,15 +189,10 @@ function App() {
   useEffect(() => {
     if (isTestMode) return; // Ne pas charger les données réelles si on est en mode test
     
-    let range = { date_debut: '', date_fin: '' };
-    if (selectedDate === 'today') {
-      range = getTodayRange();
-    } else if (selectedDate === 'tomorrow') {
-      range = getTomorrowRange();
-    }
     const loadVigilances = async () => {
       setLoading(true); // Début du chargement
-      const data = await getVigilances(range.date_debut, range.date_fin);
+      const echeance = selectedDate === 'today' ? 'J' : 'J1';
+      const data = await getVigilances(echeance);
       
       // Filtrer pour exclure FRA des vigilances
       const filteredData = data.filter(v => v.domain_id !== 'FRA');

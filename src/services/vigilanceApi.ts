@@ -7,17 +7,8 @@ interface ApiResponse {
 
 const API_URL = 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/weatherref-france-vigilance-meteo-departement/records';
 
-export async function getVigilances(date_debut: string, date_fin: string): Promise<Vigilance[]> {
+export async function getVigilances(echeance: 'J' | 'J1'): Promise<Vigilance[]> {
   try {
-    // Filtre : date_debut <= end_time AND date_fin >= begin_time
-    const dateFilter = `end_time>='${date_debut}' AND begin_time<='${date_fin}'`;
-    // Première requête : color_id > 2
-    const query1 = `color_id>2 AND ${dateFilter}`;
-    const response1 = await fetch(`${API_URL}?where=${encodeURIComponent(query1)}&limit=100`);
-    if (!response1.ok) {
-      throw new Error(`HTTP error! status: ${response1.status}`);
-    }
-    const data1: ApiResponse = await response1.json();
 
     const allDomainIds: string[] = [
       '01', '02', '03', '04', '05', '06', '07', '08', '09',
@@ -30,25 +21,41 @@ export async function getVigilances(date_debut: string, date_fin: string): Promi
       '60', '61', '62', '63', '64', '65', '66', '67', '68', '69',
       '70', '71', '72', '73', '74', '75', '76', '77', '78', '79',
       '80', '81', '82', '83', '84', '85', '86', '87', '88', '89',
-      '90', '91', '92', '93', '94', '95',
-      '971', '972', '973', '974', '976',
-      '975', '977', '978', '984', '986', '987', '988'
+      '90', '91', '92', '93', '94', '95'
     ];
-    const presentDomainIds = new Set(data1.results.map(v => v.domain_id.toString().padStart(2, '0')));
-    const missingDomainIds = allDomainIds.filter(id => !presentDomainIds.has(id));
+
+    // Filtre d'échéance selon le paramètre
+    const echeanceFilter = `echeance='${echeance}'`;
+
+    // Requêtes selon l'échéance sélectionnée
+    let data4: ApiResponse = { total_count: 0, results: [] };
+    const query4 = `color_id=4 AND ${echeanceFilter} AND domain_id IN (${allDomainIds.map(id => `'${id}'`).join(",")})`;
+    const response4 = await fetch(`${API_URL}?where=${encodeURIComponent(query4)}&limit=100`);
+    if (!response4.ok) {
+      throw new Error(`HTTP error! status: ${response4.status}`);
+    }
+    data4 = await response4.json();
+
+    let data3: ApiResponse = { total_count: 0, results: [] };
+    const query3 = `color_id=3 AND ${echeanceFilter} AND domain_id IN (${allDomainIds.map(id => `'${id}'`).join(",")})`;
+    const response3 = await fetch(`${API_URL}?where=${encodeURIComponent(query3)}&limit=100`);
+    if (!response3.ok) {
+      throw new Error(`HTTP error! status: ${response3.status}`);
+    }
+    data3 = await response3.json();
 
     let data2: ApiResponse = { total_count: 0, results: [] };
-    if (missingDomainIds.length > 0) {
-      const domainIdsStr = missingDomainIds.map(id => `'${id}'`).join(",");
-      const query2 = `color_id=2 AND ${dateFilter} AND domain_id IN (${domainIdsStr})`;
-      const response2 = await fetch(`${API_URL}?where=${encodeURIComponent(query2)}&limit=100`);
-      if (!response2.ok) {
-        throw new Error(`HTTP error! status: ${response2.status}`);
-      }
-      data2 = await response2.json();
+    const query2 = `color_id=2 AND ${echeanceFilter} AND domain_id IN (${allDomainIds.map(id => `'${id}'`).join(",")})`;
+    const response2 = await fetch(`${API_URL}?where=${encodeURIComponent(query2)}&limit=100`);
+    if (!response2.ok) {
+      throw new Error(`HTTP error! status: ${response2.status}`);
     }
+    data2 = await response2.json();
 
-    const allVigilances = [...data1.results, ...data2.results].map(vigilance => ({
+    // Combiner toutes les données selon l'échéance sélectionnée
+    const allVigilances = [
+      ...data4.results, ...data3.results, ...data2.results
+    ].map(vigilance => ({
       ...vigilance,
       domain_id: vigilance.domain_id.toString().padStart(2, '0')
     }));

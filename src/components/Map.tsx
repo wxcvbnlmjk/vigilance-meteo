@@ -240,7 +240,7 @@ export function Map({ vigilances }: MapProps) {
           const config = VIGILANCE_CONFIG[maxVigilance.color_id];
           path.setStyle({
             fillColor: config.color,
-            fillOpacity: 0.6
+            fillOpacity: 1
           });
 
           // Version plus compacte de la liste des vigilances
