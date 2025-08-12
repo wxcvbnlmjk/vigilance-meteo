@@ -149,6 +149,9 @@ function App() {
       setFilteredVigilances(testVigilances);
       setIsTestMode(true);
 
+      // Réinitialiser les filtres lors du passage en mode test
+      setFilters({});
+
       // Extraire les valeurs uniques pour les filtres
       const departmentSet = new Set();
       const departments = testVigilances
@@ -181,6 +184,8 @@ function App() {
   // Fonction pour revenir aux données réelles
   const loadRealData = () => {
     setIsTestMode(false);
+    // Réinitialiser les filtres lors du retour aux données réelles
+    setFilters({});
     // Déclencher le rechargement des données réelles
     setSelectedDate(selectedDate);
   };
@@ -229,6 +234,10 @@ function App() {
       // setUniqueDates(dates);
       setUniqueDepartments(departments);
       setUniquePhenomena(phenomena);
+      
+      // Réinitialiser les filtres lors du changement de date
+      setFilters({});
+      
       setLoading(false); // Fin du chargement
     };
 

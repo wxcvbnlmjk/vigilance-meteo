@@ -820,3 +820,135 @@ Maintenant, quand vous sélectionnez "Aujourd'hui", l'API récupérera uniquemen
 
 ---
 
+_**User**_
+
+lors du changement de date tenir compte du type de vigilance 
+
+---
+
+_**Assistant**_
+
+Je vais examiner le code pour comprendre comment gérer le changement de date en tenant compte du type de vigilance. Je vais d'abord voir la structure actuelle du composant Map et comment les filtres sont appliqués.
+
+
+---
+
+Read file: src/App.tsx
+
+---
+
+Read file: src/App.tsx
+
+---
+
+Je vois le problème ! Quand on change de date, les filtres actuels (département et type de vigilance) ne sont pas réinitialisés, ce qui peut causer des problèmes si les nouvelles données ne contiennent pas les valeurs filtrées précédemment. Je vais modifier le code pour réinitialiser les filtres lors du changement de date.
+
+
+---
+
+<details><summary>Edit file: src/App.tsx</summary>
+
+undefined
+
+**Chunk 1**
+Lines added: 4, lines removed: undefined
+
+```diff
+@@ -230,4 +230,8 @@
+        setUniqueDepartments(departments);
+        setUniquePhenomena(phenomena);
++       
++       // Réinitialiser les filtres lors du changement de date
++       setFilters({});
++       
+        setLoading(false); // Fin du chargement
+      };
+```
+
+</details>
+
+---
+
+Maintenant je vais aussi modifier la fonction `loadTestData` pour réinitialiser les filtres lors du passage en mode test :
+
+
+---
+
+Read file: src/App.tsx
+
+---
+
+<details><summary>Edit file: src/App.tsx</summary>
+
+undefined
+
+**Chunk 1**
+Lines added: 3, lines removed: undefined
+
+```diff
+@@ -149,4 +149,7 @@
+        setFilteredVigilances(testVigilances);
+        setIsTestMode(true);
++ 
++       // Réinitialiser les filtres lors du passage en mode test
++       setFilters({});
+  
+        // Extraire les valeurs uniques pour les filtres
+```
+
+</details>
+
+---
+
+Maintenant je vais aussi ajouter une réinitialisation des filtres lors du retour aux données réelles :
+
+
+---
+
+<details><summary>Edit file: src/App.tsx</summary>
+
+undefined
+
+**Chunk 1**
+Lines added: 2, lines removed: undefined
+
+```diff
+@@ -185,4 +185,6 @@
+    const loadRealData = () => {
+      setIsTestMode(false);
++     // Réinitialiser les filtres lors du retour aux données réelles
++     setFilters({});
+      // Déclencher le rechargement des données réelles
+      setSelectedDate(selectedDate);
+```
+
+</details>
+
+---
+
+Parfait ! J'ai modifié le code pour que lors du changement de date, les filtres soient correctement gérés. Voici les améliorations apportées :
+
+## Modifications pour la gestion des filtres lors du changement de date :
+
+1. **Réinitialisation des filtres lors du changement de date** : Quand l'utilisateur change de date (aujourd'hui/demain), tous les filtres (département et type de vigilance) sont réinitialisés avec `setFilters({})`.
+
+2. **Réinitialisation lors du passage en mode test** : Quand l'utilisateur active le mode test, les filtres sont également réinitialisés.
+
+3. **Réinitialisation lors du retour aux données réelles** : Quand l'utilisateur revient aux données réelles depuis le mode test, les filtres sont réinitialisés.
+
+## Avantages de ces modifications :
+
+- **Éviter les filtres invalides** : Si l'utilisateur avait sélectionné un département ou un type de vigilance qui n'existe pas dans les nouvelles données, cela éviterait d'avoir des filtres vides.
+
+- **Expérience utilisateur cohérente** : L'utilisateur voit toujours toutes les données disponibles pour la nouvelle date sélectionnée.
+
+- **Prévention des erreurs** : Évite les problèmes potentiels où les filtres pourraient référencer des données qui n'existent plus.
+
+Maintenant, quand vous changez de date, l'application :
+1. Charge les nouvelles données pour la date sélectionnée
+2. Met à jour les listes de départements et types de vigilance disponibles
+3. Réinitialise tous les filtres pour afficher toutes les données
+4. L'utilisateur peut ensuite appliquer de nouveaux filtres sur les données actuelles
+
+---
+
